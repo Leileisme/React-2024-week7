@@ -2,7 +2,7 @@ import { useNavigate } from "react-router"
 import { useEffect, useState, useRef } from "react"
 import { setIsLogin } from "../../slice/stateReducer"
 import { useDispatch, useSelector } from "react-redux"
-import { showSuccessToast,showDangerToast } from '../../utils/toastUtils'
+import { showSuccessToast,showDangerToast, showErrorToast } from '../../utils/toastUtils'
 
 import ProductList from '../../component/AdminProductList'
 import ProductModal from '../../component/AdminProductModal';
@@ -16,9 +16,9 @@ const path = import.meta.env.VITE_API_PATH
 
 const ProductManagement = () => {
 
-  const isLogin = useSelector((state)=> state.state.isLogin)
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
+  // const isLogin = useSelector((state)=> state.state.isLogin)
+  // const dispatch = useDispatch()
+  // const navigate = useNavigate()
 
   const [product,setProduct] = useState({
     id: "",
@@ -46,31 +46,8 @@ const ProductManagement = () => {
 
 
   useEffect(()=>{
-    const token = document.cookie.replace(
-      /(?:(?:^|.*;\s*)token\s*=\s*([^;]*).*$)|^.*$/,
-      "$1"
-    );
-
-    if (token) {
-      axios.defaults.headers.common.Authorization = token;
-    } else {
-      // console.log('Token not found);
-      showDangerToast('Token not found')
-    }
-
-    checkLogin()
     getProducts()
   },[])
-
-  async function checkLogin(){
-    try {
-      await axios.post(`${api}/v2/api/user/check`)
-      dispatch(setIsLogin(true))
-    } catch (error) {
-      // console.log(error)
-      navigate('/login')
-    }
-  }
 
   // 取得產品資訊
   async function getProducts(e,page=1) {
@@ -83,6 +60,7 @@ const ProductManagement = () => {
       setPagination(res.data.pagination)     
     } catch (error) {
       // console.log(error)
+      showErrorToast('取得產品錯誤')
     }
   }
 
